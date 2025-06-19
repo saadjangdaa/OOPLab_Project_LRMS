@@ -1,0 +1,30 @@
+Key OOP Principles Applied
+Encapsulation:
+
+All classes have private fields with public methods to access/modify them
+
+Internal implementation details are hidden
+
+Inheritance:
+
+Laptop extends the abstract RentalItem class
+
+Abstract class defines common properties/methods that all rental items share
+
+Polymorphism:
+
+The getDetails() method is abstract in RentalItem and implemented differently in Laptop
+
+Allows for future expansion with other rental item types
+
+Composition:
+
+LaptopRentalSystem contains lists of students, laptops, and rental records
+
+Better than inheritance for this relationship
+
+Single Responsibility Principle:
+
+Each class has a clear, single purpose
+
+Student handles student data, Laptop handles laptop data, etc.
