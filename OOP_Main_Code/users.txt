@@ -1,2 +1,3 @@
 Username: admin Password: admin123 Role: 0
 Username: student1 Password: student123 Role: 1
+Username: admin Password: admin123 Role: 0
