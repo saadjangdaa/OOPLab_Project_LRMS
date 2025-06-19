@@ -1,0 +1,32 @@
+Key OOP Principles Applied
+Encapsulation:
+
+All fields are private and accessed through getters/setters
+
+Implementation details are hidden within classes
+
+Inheritance:
+
+Could extend User to Student/Admin if more specialization needed
+
+Currently using composition over inheritance where appropriate
+
+Polymorphism:
+
+Service interfaces could be introduced for different implementations
+
+Method overriding in subclasses if using inheritance
+
+Single Responsibility Principle:
+
+Each class has a single responsibility
+
+Separate classes for models, repositories, and services
+
+Separation of Concerns:
+
+Clear separation between data access (repository), business logic (service), and presentation (main)
+
+Dependency Injection:
+
+Services are injected into main class (could be improved with DI framework)

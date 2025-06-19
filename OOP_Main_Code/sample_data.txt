@@ -1,0 +1,46 @@
+SAMPLE DATA FOR LAPTOP RENTAL MANAGEMENT SYSTEM
+================================================
+
+This file contains sample data that can be used to test the system.
+
+DEFAULT ADMIN ACCOUNT:
+- Username: admin
+- Password: admin123
+- Role: Admin (0)
+
+SAMPLE STUDENTS (to be added via the system):
+1. ID: 1001, Name: John Doe, Email: john@university.edu, Phone: 123-456-7890, Department: Computer Science
+2. ID: 1002, Name: Jane Smith, Email: jane@university.edu, Phone: 234-567-8901, Department: Engineering
+3. ID: 1003, Name: Bob Johnson, Email: bob@university.edu, Phone: 345-678-9012, Department: Business
+
+SAMPLE LAPTOPS (to be added via the system):
+1. ID: 2001, Brand: Dell, Model: Latitude 5520, Specs: i7-1165G7, 16GB RAM, 512GB SSD, Rate: 250.0, Condition: New
+2. ID: 2002, Brand: HP, Model: EliteBook 840, Specs: i5-1135G7, 8GB RAM, 256GB SSD, Rate: 200.0, Condition: Good
+3. ID: 2003, Brand: Lenovo, Model: ThinkPad X1, Specs: i7-1185G7, 16GB RAM, 1TB SSD, Rate: 300.0, Condition: New
+4. ID: 2004, Brand: Apple, Model: MacBook Pro, Specs: M1 Pro, 16GB RAM, 512GB SSD, Rate: 350.0, Condition: New
+5. ID: 2005, Brand: Dell, Model: Inspiron 15, Specs: i5-1035G1, 8GB RAM, 256GB SSD, Rate: 180.0, Condition: Fair
+
+SAMPLE BOOKINGS (will be created when students book laptops):
+- These will be automatically generated when students use the booking functionality
+
+FILE STRUCTURE:
+The system will create the following data files:
+- users.txt: Contains user accounts (admin and students)
+- students.txt: Contains detailed student information
+- laptops.txt: Contains laptop inventory
+- bookings.txt: Contains booking records
+
+USAGE INSTRUCTIONS:
+1. Run the Main.java file
+2. Login as admin (username: admin, password: admin123)
+3. Use the admin menu to add sample students and laptops
+4. Create student accounts for testing
+5. Test the booking functionality
+
+FEATURES TO TEST:
+- Student registration and management
+- Laptop inventory management
+- Booking and returning laptops
+- Viewing system statistics
+- Checking overdue bookings
+- Extending booking duration 
