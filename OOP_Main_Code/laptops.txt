@@ -1,0 +1,1 @@
+1. ID: 2001, Brand: Dell, Model: Latitude 5520, Specs: i7-1165G7, 16GB RAM, 512GB SSD, Rate: 250.0, Condition: New

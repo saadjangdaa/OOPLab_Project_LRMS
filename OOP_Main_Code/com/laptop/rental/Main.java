@@ -12,6 +12,7 @@ import com.laptop.rental.service.StudentService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
@@ -139,11 +140,12 @@ public class Main {
         while (true) {
             System.out.println("\n=== STUDENT MENU ===");
             System.out.println("1. View Available Laptops");
-            System.out.println("2. Book a Laptop");
-            System.out.println("3. Return a Laptop");
-            System.out.println("4. View My Bookings");
-            System.out.println("5. Extend Booking");
-            System.out.println("6. Logout");
+            System.out.println("2. Search Laptops");
+            System.out.println("3. Book a Laptop");
+            System.out.println("4. Return a Laptop");
+            System.out.println("5. View My Bookings");
+            System.out.println("6. Extend Booking");
+            System.out.println("7. Logout");
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
@@ -154,18 +156,21 @@ public class Main {
                     viewAvailableLaptops();
                     break;
                 case 2:
-                    bookLaptop();
+                    searchLaptops();
                     break;
                 case 3:
-                    returnLaptop();
+                    bookLaptop();
                     break;
                 case 4:
-                    viewMyBookings();
+                    returnLaptop();
                     break;
                 case 5:
-                    extendBooking();
+                    viewMyBookings();
                     break;
                 case 6:
+                    extendBooking();
+                    break;
+                case 7:
                     System.out.println("Logged out successfully.");
                     return;
                 default:
@@ -546,5 +551,118 @@ public class Main {
 
     private static void setLaptopAvailability() {
         System.out.println("Set laptop availability functionality - to be implemented");
+    }
+
+    private static void searchLaptops() {
+        try {
+            System.out.println("\n=== SEARCH LAPTOPS ===");
+            System.out.println("1. Search by Brand");
+            System.out.println("2. Search by Model");
+            System.out.println("3. Search by Specifications");
+            System.out.println("4. General Search (All Fields)");
+            System.out.println("5. Search Available Laptops Only");
+            System.out.println("6. Back to Student Menu");
+            System.out.print("Enter your choice: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            
+            String searchQuery = "";
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter brand name to search: ");
+                    searchQuery = scanner.nextLine();
+                    searchLaptopsByCriteria("brand", searchQuery, false);
+                    break;
+                case 2:
+                    System.out.print("Enter model name to search: ");
+                    searchQuery = scanner.nextLine();
+                    searchLaptopsByCriteria("model", searchQuery, false);
+                    break;
+                case 3:
+                    System.out.print("Enter specifications to search: ");
+                    searchQuery = scanner.nextLine();
+                    searchLaptopsByCriteria("specifications", searchQuery, false);
+                    break;
+                case 4:
+                    System.out.print("Enter search term (searches all fields): ");
+                    searchQuery = scanner.nextLine();
+                    searchLaptopsByCriteria("general", searchQuery, false);
+                    break;
+                case 5:
+                    System.out.print("Enter search term for available laptops: ");
+                    searchQuery = scanner.nextLine();
+                    searchLaptopsByCriteria("general", searchQuery, true);
+                    break;
+                case 6:
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error during search: " + e.getMessage());
+        }
+    }
+    
+    private static void searchLaptopsByCriteria(String criteria, String searchQuery, boolean availableOnly) {
+        try {
+            List<Laptop> allLaptops = laptopService.getAllLaptops();
+            List<Laptop> searchResults = new ArrayList<>();
+            
+            for (Laptop laptop : allLaptops) {
+                boolean matches = false;
+                switch (criteria.toLowerCase()) {
+                    case "brand":
+                        matches = laptop.getBrand().toLowerCase().contains(searchQuery.toLowerCase());
+                        break;
+                    case "model":
+                        matches = laptop.getModel().toLowerCase().contains(searchQuery.toLowerCase());
+                        break;
+                    case "specifications":
+                        matches = laptop.getSpecifications().toLowerCase().contains(searchQuery.toLowerCase());
+                        break;
+                    case "general":
+                        // Search across all fields
+                        matches = laptop.getBrand().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                                 laptop.getModel().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                                 laptop.getSpecifications().toLowerCase().contains(searchQuery.toLowerCase());
+                        break;
+                }
+                
+                if (matches && (!availableOnly || laptop.isAvailable())) {
+                    searchResults.add(laptop);
+                }
+            }
+            
+            if (searchResults.isEmpty()) {
+                if (availableOnly) {
+                    System.out.println("No available laptops found matching your search criteria.");
+                } else {
+                    System.out.println("No laptops found matching your search criteria.");
+                }
+                return;
+            }
+            
+            String title = availableOnly ? "=== SEARCH RESULTS (Available Laptops Only) ===" : "=== SEARCH RESULTS ===";
+            System.out.println("\n" + title);
+            System.out.printf("%-5s %-15s %-15s %-20s %-10s %-10s %-10s%n", 
+                "ID", "Brand", "Model", "Specifications", "Available", "Rate", "Condition");
+            System.out.println("--------------------------------------------------------------------------------");
+            
+            for (Laptop laptop : searchResults) {
+                System.out.printf("%-5d %-15s %-15s %-20s %-10s %-10.2f %-10s%n", 
+                    laptop.getId(), laptop.getBrand(), laptop.getModel(), 
+                    laptop.getSpecifications(), laptop.isAvailable(), 
+                    laptop.getHourlyRate(), laptop.getCondition());
+            }
+            
+            String resultMessage = availableOnly ? 
+                "Found " + searchResults.size() + " available laptop(s) matching your search." :
+                "Found " + searchResults.size() + " laptop(s) matching your search.";
+            System.out.println("\n" + resultMessage);
+            
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }

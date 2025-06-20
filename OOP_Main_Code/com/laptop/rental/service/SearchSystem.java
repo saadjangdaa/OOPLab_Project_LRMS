@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.Scanner;
 
-public class LaptopStudentSystem {
+public class SearchSystem {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
