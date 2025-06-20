@@ -534,23 +534,208 @@ public class Main {
 
     // Placeholder methods for admin functions
     private static void updateStudent() {
-        System.out.println("Update student functionality - to be implemented");
+        try {
+            System.out.print("Enter student ID to update: ");
+            int id = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            
+            Student student = studentService.getStudentById(id);
+            if (student == null) {
+                System.out.println("Student not found with ID: " + id);
+                return;
+            }
+            
+            System.out.println("Current student information:");
+            System.out.println("Name: " + student.getName());
+            System.out.println("Email: " + student.getEmail());
+            System.out.println("Phone: " + student.getPhoneNumber());
+            System.out.println("Department: " + student.getDepartment());
+            System.out.println();
+            
+            System.out.print("Enter new name (or press Enter to keep current): ");
+            String name = scanner.nextLine();
+            if (name.isEmpty()) name = student.getName();
+            
+            System.out.print("Enter new email (or press Enter to keep current): ");
+            String email = scanner.nextLine();
+            if (email.isEmpty()) email = student.getEmail();
+            
+            System.out.print("Enter new phone number (or press Enter to keep current): ");
+            String phone = scanner.nextLine();
+            if (phone.isEmpty()) phone = student.getPhoneNumber();
+            
+            System.out.print("Enter new department (or press Enter to keep current): ");
+            String department = scanner.nextLine();
+            if (department.isEmpty()) department = student.getDepartment();
+
+            if (studentService.updateStudent(id, name, email, phone, department)) {
+                System.out.println("Student updated successfully!");
+            } else {
+                System.out.println("Failed to update student.");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void deleteStudent() {
-        System.out.println("Delete student functionality - to be implemented");
+        try {
+            System.out.print("Enter student ID to delete: ");
+            int id = scanner.nextInt();
+            
+            Student student = studentService.getStudentById(id);
+            if (student == null) {
+                System.out.println("Student not found with ID: " + id);
+                return;
+            }
+            
+            System.out.println("Student to delete:");
+            System.out.println("ID: " + student.getId());
+            System.out.println("Name: " + student.getName());
+            System.out.println("Email: " + student.getEmail());
+            System.out.println("Department: " + student.getDepartment());
+            
+            System.out.print("Are you sure you want to delete this student? (y/n): ");
+            String confirm = scanner.next();
+            
+            if (confirm.equalsIgnoreCase("y") || confirm.equalsIgnoreCase("yes")) {
+                if (studentService.deleteStudent(id)) {
+                    System.out.println("Student deleted successfully!");
+                } else {
+                    System.out.println("Failed to delete student.");
+                }
+            } else {
+                System.out.println("Deletion cancelled.");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void updateLaptop() {
-        System.out.println("Update laptop functionality - to be implemented");
+        try {
+            System.out.print("Enter laptop ID to update: ");
+            int id = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            
+            Laptop laptop = laptopService.getLaptopById(id);
+            if (laptop == null) {
+                System.out.println("Laptop not found with ID: " + id);
+                return;
+            }
+            
+            System.out.println("Current laptop information:");
+            System.out.println("Brand: " + laptop.getBrand());
+            System.out.println("Model: " + laptop.getModel());
+            System.out.println("Specifications: " + laptop.getSpecifications());
+            System.out.println("Hourly Rate: " + laptop.getHourlyRate());
+            System.out.println("Condition: " + laptop.getCondition());
+            System.out.println("Available: " + laptop.isAvailable());
+            System.out.println();
+            
+            System.out.print("Enter new brand (or press Enter to keep current): ");
+            String brand = scanner.nextLine();
+            if (brand.isEmpty()) brand = laptop.getBrand();
+            
+            System.out.print("Enter new model (or press Enter to keep current): ");
+            String model = scanner.nextLine();
+            if (model.isEmpty()) model = laptop.getModel();
+            
+            System.out.print("Enter new specifications (or press Enter to keep current): ");
+            String specs = scanner.nextLine();
+            if (specs.isEmpty()) specs = laptop.getSpecifications();
+            
+            System.out.print("Enter new hourly rate (or press Enter to keep current): ");
+            String rateStr = scanner.nextLine();
+            double rate = laptop.getHourlyRate();
+            if (!rateStr.isEmpty()) {
+                try {
+                    rate = Double.parseDouble(rateStr);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid rate format. Keeping current rate.");
+                }
+            }
+            
+            System.out.print("Enter new condition (New/Good/Fair/Poor) (or press Enter to keep current): ");
+            String condition = scanner.nextLine();
+            if (condition.isEmpty()) condition = laptop.getCondition();
+
+            if (laptopService.updateLaptop(id, brand, model, specs, rate, condition)) {
+                System.out.println("Laptop updated successfully!");
+            } else {
+                System.out.println("Failed to update laptop.");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void deleteLaptop() {
-        System.out.println("Delete laptop functionality - to be implemented");
+        try {
+            System.out.print("Enter laptop ID to delete: ");
+            int id = scanner.nextInt();
+            
+            Laptop laptop = laptopService.getLaptopById(id);
+            if (laptop == null) {
+                System.out.println("Laptop not found with ID: " + id);
+                return;
+            }
+            
+            System.out.println("Laptop to delete:");
+            System.out.println("ID: " + laptop.getId());
+            System.out.println("Brand: " + laptop.getBrand());
+            System.out.println("Model: " + laptop.getModel());
+            System.out.println("Specifications: " + laptop.getSpecifications());
+            System.out.println("Available: " + laptop.isAvailable());
+            
+            System.out.print("Are you sure you want to delete this laptop? (y/n): ");
+            String confirm = scanner.next();
+            
+            if (confirm.equalsIgnoreCase("y") || confirm.equalsIgnoreCase("yes")) {
+                if (laptopService.deleteLaptop(id)) {
+                    System.out.println("Laptop deleted successfully!");
+                } else {
+                    System.out.println("Failed to delete laptop.");
+                }
+            } else {
+                System.out.println("Deletion cancelled.");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void setLaptopAvailability() {
-        System.out.println("Set laptop availability functionality - to be implemented");
+        try {
+            System.out.print("Enter laptop ID: ");
+            int id = scanner.nextInt();
+            
+            Laptop laptop = laptopService.getLaptopById(id);
+            if (laptop == null) {
+                System.out.println("Laptop not found with ID: " + id);
+                return;
+            }
+            
+            System.out.println("Current laptop information:");
+            System.out.println("ID: " + laptop.getId());
+            System.out.println("Brand: " + laptop.getBrand());
+            System.out.println("Model: " + laptop.getModel());
+            System.out.println("Currently Available: " + laptop.isAvailable());
+            System.out.println();
+            
+            System.out.print("Set availability (1 for Available, 0 for Not Available): ");
+            int availabilityChoice = scanner.nextInt();
+            boolean available = (availabilityChoice == 1);
+            
+            if (laptopService.setLaptopAvailability(id, available)) {
+                System.out.println("Laptop availability updated successfully!");
+                System.out.println("Laptop is now " + (available ? "Available" : "Not Available"));
+            } else {
+                System.out.println("Failed to update laptop availability.");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void searchLaptops() {
