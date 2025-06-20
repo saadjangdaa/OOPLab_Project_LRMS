@@ -4,31 +4,37 @@ package com.laptop.rental.model;
 import java.time.LocalDateTime;
 
 public class Booking {
-    private String bookingId;
+    private int bookingId;
     private int studentId;
     private int laptopId;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private String status;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private int hours;
+    private boolean returned;
+    private LocalDateTime actualReturnTime;
     private LocalDateTime createdAt;
-    private LocalDateTime cancelledAt;
-    private LocalDateTime returnedAt;
 
     public Booking() {
-    }
-
-    public Booking(String bookingId, int studentId, int laptopId, LocalDateTime startDate, LocalDateTime endDate) {
-        this.bookingId = bookingId;
-        this.studentId = studentId;
-        this.laptopId = laptopId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = "ACTIVE";
         this.createdAt = LocalDateTime.now();
     }
 
-    public String getBookingId() { return bookingId; }
-    public void setBookingId(String bookingId) { this.bookingId = bookingId; }
+    public Booking(int studentId, int laptopId, LocalDateTime startTime, LocalDateTime endTime, int hours) {
+        this.bookingId = generateBookingId();
+        this.studentId = studentId;
+        this.laptopId = laptopId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.hours = hours;
+        this.returned = false;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    private int generateBookingId() {
+        return (int) (System.currentTimeMillis() % 1000000);
+    }
+
+    public int getBookingId() { return bookingId; }
+    public void setBookingId(int bookingId) { this.bookingId = bookingId; }
 
     public int getStudentId() { return studentId; }
     public void setStudentId(int studentId) { this.studentId = studentId; }
@@ -36,33 +42,34 @@ public class Booking {
     public int getLaptopId() { return laptopId; }
     public void setLaptopId(int laptopId) { this.laptopId = laptopId; }
     
-    public LocalDateTime getStartDate() { return startDate; }
-    public void setStartDate(LocalDateTime startDate) { this.startDate = startDate; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
     
-    public LocalDateTime getEndDate() { return endDate; }
-    public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
     
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public int getHours() { return hours; }
+    public void setHours(int hours) { this.hours = hours; }
+    
+    public boolean isReturned() { return returned; }
+    public void setReturned(boolean returned) { this.returned = returned; }
+    
+    public LocalDateTime getActualReturnTime() { return actualReturnTime; }
+    public void setActualReturnTime(LocalDateTime actualReturnTime) { this.actualReturnTime = actualReturnTime; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public LocalDateTime getCancelledAt() { return cancelledAt; }
-    public void setCancelledAt(LocalDateTime cancelledAt) { this.cancelledAt = cancelledAt; }
-
-    public LocalDateTime getReturnedAt() { return returnedAt; }
-    public void setReturnedAt(LocalDateTime returnedAt) { this.returnedAt = returnedAt; }
-
     @Override
     public String toString() {
         return "Booking{" +
-                "bookingId='" + bookingId + '\'' +
+                "bookingId=" + bookingId +
                 ", studentId=" + studentId +
                 ", laptopId=" + laptopId +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", status='" + status + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", hours=" + hours +
+                ", returned=" + returned +
                 '}';
     }
 }

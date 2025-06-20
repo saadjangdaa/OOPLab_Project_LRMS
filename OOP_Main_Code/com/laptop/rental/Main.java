@@ -386,15 +386,11 @@ public class Main {
             int laptopId = scanner.nextInt();
             scanner.nextLine();
             
-            System.out.print("Enter start date (YYYY-MM-DD HH:MM): ");
-            String startDateStr = scanner.nextLine();
-            LocalDateTime startDate = LocalDateTime.parse(startDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            
-            System.out.print("Enter end date (YYYY-MM-DD HH:MM): ");
-            String endDateStr = scanner.nextLine();
-            LocalDateTime endDate = LocalDateTime.parse(endDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            System.out.print("Enter number of hours to book: ");
+            int hours = scanner.nextInt();
+            scanner.nextLine();
 
-            if (bookingService.createBooking(studentId, laptopId, startDate, endDate)) {
+            if (bookingService.createBooking(studentId, laptopId, hours)) {
                 System.out.println("Laptop booked successfully!");
             } else {
                 System.out.println("Failed to book laptop. Laptop might not be available or you already have an active booking.");
@@ -407,7 +403,8 @@ public class Main {
     private static void returnLaptop() {
         try {
             System.out.print("Enter booking ID to return: ");
-            String bookingId = scanner.nextLine();
+            int bookingId = scanner.nextInt();
+            scanner.nextLine();
             
             if (bookingService.returnLaptop(bookingId)) {
                 System.out.println("Laptop returned successfully!");
@@ -425,7 +422,7 @@ public class Main {
             int studentId = scanner.nextInt();
             scanner.nextLine();
             
-            List<Booking> bookings = bookingService.getBookingsByStudent(studentId);
+            List<Booking> bookings = bookingService.getStudentBookings(studentId);
             if (bookings.isEmpty()) {
                 System.out.println("No bookings found for this student.");
                 return;
@@ -433,15 +430,15 @@ public class Main {
             
             System.out.println("\n=== MY BOOKINGS ===");
             System.out.printf("%-15s %-15s %-20s %-20s %-10s%n", 
-                "BookingID", "LaptopID", "StartDate", "EndDate", "Status");
+                "BookingID", "LaptopID", "StartTime", "EndTime", "Returned");
             System.out.println("--------------------------------------------------------------------------------");
             
             for (Booking booking : bookings) {
-                System.out.printf("%-15s %-15d %-20s %-20s %-10s%n", 
+                System.out.printf("%-15d %-15d %-20s %-20s %-10s%n", 
                     booking.getBookingId(), booking.getLaptopId(), 
-                    booking.getStartDate().toString().substring(0, 16), 
-                    booking.getEndDate().toString().substring(0, 16), 
-                    booking.getStatus());
+                    booking.getStartTime().toString().substring(0, 16), 
+                    booking.getEndTime().toString().substring(0, 16), 
+                    booking.isReturned() ? "Yes" : "No");
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -458,15 +455,15 @@ public class Main {
             
             System.out.println("\n=== ALL BOOKINGS ===");
             System.out.printf("%-15s %-15s %-15s %-20s %-20s %-10s%n", 
-                "BookingID", "StudentID", "LaptopID", "StartDate", "EndDate", "Status");
+                "BookingID", "StudentID", "LaptopID", "StartTime", "EndTime", "Returned");
             System.out.println("--------------------------------------------------------------------------------");
             
             for (Booking booking : bookings) {
-                System.out.printf("%-15s %-15s %-15s %-20s %-20s %-10s%n", 
+                System.out.printf("%-15d %-15d %-15d %-20s %-20s %-10s%n", 
                     booking.getBookingId(), booking.getStudentId(), booking.getLaptopId(), 
-                    booking.getStartDate().toString().substring(0, 16), 
-                    booking.getEndDate().toString().substring(0, 16), 
-                    booking.getStatus());
+                    booking.getStartTime().toString().substring(0, 16), 
+                    booking.getEndTime().toString().substring(0, 16), 
+                    booking.isReturned() ? "Yes" : "No");
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
