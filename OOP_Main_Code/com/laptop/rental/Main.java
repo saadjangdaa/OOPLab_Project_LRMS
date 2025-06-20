@@ -32,7 +32,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -52,7 +52,6 @@ public class Main {
 
     private static void initializeSystem() {
         try {
-            // Create default admin account if it doesn't exist
             authService.signup("admin", "admin123", 0);
             System.out.println("System initialized successfully!");
         } catch (IOException e) {
@@ -90,7 +89,7 @@ public class Main {
         String password = scanner.nextLine();
 
         try {
-            authService.signup(username, password, 1); // Default role is student
+            authService.signup(username, password, 1);
             System.out.println("Signup successful! You can now login.");
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
@@ -109,7 +108,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -149,7 +148,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -190,7 +189,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -225,7 +224,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -255,7 +254,7 @@ public class Main {
         try {
             System.out.print("Enter student ID: ");
             int id = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             System.out.print("Enter student name: ");
             String name = scanner.nextLine();
@@ -308,7 +307,7 @@ public class Main {
         try {
             System.out.print("Enter laptop ID: ");
             int id = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             System.out.print("Enter brand: ");
             String brand = scanner.nextLine();
@@ -321,7 +320,7 @@ public class Main {
             
             System.out.print("Enter hourly rate: ");
             double rate = scanner.nextDouble();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             System.out.print("Enter condition (New/Good/Fair/Poor): ");
             String condition = scanner.nextLine();
@@ -532,12 +531,11 @@ public class Main {
         }
     }
 
-    // Placeholder methods for admin functions
     private static void updateStudent() {
         try {
             System.out.print("Enter student ID to update: ");
             int id = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             Student student = studentService.getStudentById(id);
             if (student == null) {
@@ -616,7 +614,7 @@ public class Main {
         try {
             System.out.print("Enter laptop ID to update: ");
             int id = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             Laptop laptop = laptopService.getLaptopById(id);
             if (laptop == null) {
@@ -750,7 +748,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             String searchQuery = "";
             switch (choice) {
@@ -807,7 +805,6 @@ public class Main {
                         matches = laptop.getSpecifications().toLowerCase().contains(searchQuery.toLowerCase());
                         break;
                     case "general":
-                        // Search across all fields
                         matches = laptop.getBrand().toLowerCase().contains(searchQuery.toLowerCase()) ||
                                  laptop.getModel().toLowerCase().contains(searchQuery.toLowerCase()) ||
                                  laptop.getSpecifications().toLowerCase().contains(searchQuery.toLowerCase());

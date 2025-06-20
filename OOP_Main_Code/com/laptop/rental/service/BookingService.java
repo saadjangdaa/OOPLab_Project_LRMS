@@ -1,4 +1,3 @@
-// BookingService.java
 package com.laptop.rental.service;
 
 import com.laptop.rental.model.Booking;
@@ -65,7 +64,6 @@ public class BookingService {
         booking.setStatus("Cancelled");
         bookingRepository.update(booking);
 
-        // Make laptop available again
         Laptop laptop = laptopRepository.findById(booking.getLaptopId());
         if (laptop != null) {
             laptop.setAvailable(true);
@@ -80,7 +78,7 @@ public class BookingService {
         double totalRevenue = 0.0;
         
         for (Booking booking : allBookings) {
-            if (!booking.isActive()) { // Only count completed bookings
+            if (!booking.isActive()) {
                 totalRevenue += booking.getTotalCharge();
             }
         }
@@ -93,7 +91,7 @@ public class BookingService {
         double totalDebt = 0.0;
         
         for (Booking booking : studentBookings) {
-            if (booking.isActive()) { // Only count active bookings
+            if (booking.isActive()) { 
                 totalDebt += booking.getTotalCharge();
             }
         }
@@ -122,7 +120,7 @@ public class BookingService {
         
         for (Booking booking : activeBookings) {
             long bookingTime = booking.getBookingDate().getTime();
-            long durationInMillis = booking.getDurationHours() * 60 * 60 * 1000L; // Convert hours to milliseconds
+            long durationInMillis = booking.getDurationHours() * 60 * 60 * 1000L;
             
             if (currentTime > bookingTime + durationInMillis) {
                 booking.setStatus("Overdue");

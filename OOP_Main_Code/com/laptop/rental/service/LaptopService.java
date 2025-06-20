@@ -9,7 +9,6 @@ public class LaptopService {
     private LaptopRepository laptopRepository = new LaptopRepository();
 
     public boolean addLaptop(int id, String brand, String model, String specifications, double hourlyRate, String condition) throws IOException {
-        // Check if laptop already exists
         if (laptopRepository.findById(id) != null) {
             return false;
         }

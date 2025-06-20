@@ -9,7 +9,6 @@ public class StudentService {
     private StudentRepository studentRepository = new StudentRepository();
 
     public boolean registerStudent(int id, String name, String password, String email, String phoneNumber, String department) throws IOException {
-        // Check if student already exists
         if (studentRepository.findById(id) != null) {
             return false;
         }

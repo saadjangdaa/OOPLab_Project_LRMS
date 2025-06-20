@@ -5,7 +5,6 @@ public class SearchSystem {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-        // Login
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
@@ -20,7 +19,6 @@ public class SearchSystem {
         
         System.out.println("Login successful. Role: " + role);
         
-        // Main menu loop
         while (true) {
             System.out.println("\n--- Menu ---");
             if (role.equals("admin")) {
@@ -34,7 +32,7 @@ public class SearchSystem {
             
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             if (role.equals("admin")) {
                 switch (choice) {

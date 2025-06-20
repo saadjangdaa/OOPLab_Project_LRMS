@@ -7,13 +7,13 @@ public class Laptop {
     private String specifications;
     private boolean available;
     private double hourlyRate;
-    private String condition; // New, Good, Fair, Poor
+    private String condition;
 
     public Laptop(int id, String brand, boolean available) {
         this.id = id;
         this.brand = brand;
         this.available = available;
-        this.hourlyRate = 200.0; // Default rate
+        this.hourlyRate = 200.0;
         this.condition = "Good";
     }
 
@@ -27,7 +27,6 @@ public class Laptop {
         this.condition = condition;
     }
 
-    // Getters and setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     
