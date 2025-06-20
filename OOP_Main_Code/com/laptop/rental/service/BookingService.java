@@ -1,134 +1,141 @@
 package com.laptop.rental.service;
 
 import com.laptop.rental.model.Booking;
+import com.laptop.rental.model.Student;
 import com.laptop.rental.model.Laptop;
 import com.laptop.rental.repository.BookingRepository;
+import com.laptop.rental.repository.StudentRepository;
 import com.laptop.rental.repository.LaptopRepository;
-import java.io.IOException;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class BookingService {
-    private BookingRepository bookingRepository = new BookingRepository();
-    private LaptopRepository laptopRepository = new LaptopRepository();
+    private BookingRepository bookingRepository;
+    private StudentRepository studentRepository;
+    private LaptopRepository laptopRepository;
 
-    public boolean bookLaptop(int studentId, int laptopId, int durationHours) throws IOException {
-        Laptop laptop = laptopRepository.findById(laptopId);
-        if (laptop == null || !laptop.isAvailable()) {
+    public BookingService() {
+        this.bookingRepository = new BookingRepository();
+        this.studentRepository = new StudentRepository();
+        this.laptopRepository = new LaptopRepository();
+    }
+
+    public boolean createBooking(int studentId, int laptopId, LocalDateTime startDate, LocalDateTime endDate) {
+        Optional<Student> studentOpt = studentRepository.findById(studentId);
+        Optional<Laptop> laptopOpt = laptopRepository.findById(laptopId);
+
+        if (!studentOpt.isPresent() || !laptopOpt.isPresent()) {
             return false;
         }
 
-        Booking booking = new Booking(studentId, laptopId, durationHours, laptop.getHourlyRate());
-        bookingRepository.save(booking);
+        Student student = studentOpt.get();
+        Laptop laptop = laptopOpt.get();
+
+        if (!laptop.isAvailable()) {
+            return false;
+        }
+
+        List<Booking> existingBookings = bookingRepository.findByStudentId(studentId);
+        for (Booking booking : existingBookings) {
+            if (booking.getStatus().equals("ACTIVE")) {
+                return false;
+            }
+        }
+
+        Booking booking = new Booking();
+        booking.setBookingId(generateBookingId());
+        booking.setStudentId(studentId);
+        booking.setLaptopId(laptopId);
+        booking.setStartDate(startDate);
+        booking.setEndDate(endDate);
+        booking.setStatus("ACTIVE");
+        booking.setCreatedAt(LocalDateTime.now());
+
+        boolean bookingSaved = bookingRepository.save(booking);
         
+        if (bookingSaved) {
         laptop.setAvailable(false);
         laptopRepository.update(laptop);
+        }
         
-        return true;
+        return bookingSaved;
     }
 
-    public boolean returnLaptop(int studentId, int laptopId) throws IOException {
-        boolean success = bookingRepository.markAsReturned(studentId, laptopId);
-        if (success) {
-            Laptop laptop = laptopRepository.findById(laptopId);
-            if (laptop != null) {
+    public boolean cancelBooking(String bookingId) {
+        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+        if (!bookingOpt.isPresent()) {
+            return false;
+        }
+
+        Booking booking = bookingOpt.get();
+        if (!booking.getStatus().equals("ACTIVE")) {
+            return false;
+        }
+
+        booking.setStatus("CANCELLED");
+        booking.setCancelledAt(LocalDateTime.now());
+
+        boolean bookingUpdated = bookingRepository.update(booking);
+        
+        if (bookingUpdated) {
+            Optional<Laptop> laptopOpt = laptopRepository.findById(booking.getLaptopId());
+            if (laptopOpt.isPresent()) {
+                Laptop laptop = laptopOpt.get();
                 laptop.setAvailable(true);
                 laptopRepository.update(laptop);
             }
         }
-        return success;
+
+        return bookingUpdated;
     }
 
-    public List<Booking> getStudentBookings(int studentId) throws IOException {
+    public boolean returnLaptop(String bookingId) {
+        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+        if (!bookingOpt.isPresent()) {
+            return false;
+        }
+
+        Booking booking = bookingOpt.get();
+        if (!booking.getStatus().equals("ACTIVE")) {
+            return false;
+        }
+
+        booking.setStatus("RETURNED");
+        booking.setReturnedAt(LocalDateTime.now());
+
+        boolean bookingUpdated = bookingRepository.update(booking);
+
+        if (bookingUpdated) {
+            Optional<Laptop> laptopOpt = laptopRepository.findById(booking.getLaptopId());
+            if (laptopOpt.isPresent()) {
+                Laptop laptop = laptopOpt.get();
+            laptop.setAvailable(true);
+            laptopRepository.update(laptop);
+            }
+        }
+
+        return bookingUpdated;
+    }
+
+    public List<Booking> getBookingsByStudent(int studentId) {
         return bookingRepository.findByStudentId(studentId);
     }
 
-    public List<Booking> getLaptopBookings(int laptopId) throws IOException {
-        return bookingRepository.findByLaptopId(laptopId);
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
     }
 
-    public List<Booking> getActiveBookings() throws IOException {
-        return bookingRepository.findActive();
+    public Optional<Booking> getBookingById(String bookingId) {
+        return bookingRepository.findById(bookingId);
     }
 
-    public Booking getBookingById(int id) throws IOException {
-        return bookingRepository.findById(id);
+    public List<Booking> getActiveBookings() {
+        return bookingRepository.findByStatus("ACTIVE");
     }
 
-    public boolean cancelBooking(int bookingId) throws IOException {
-        Booking booking = bookingRepository.findById(bookingId);
-        if (booking == null || !booking.isActive()) {
-            return false;
-        }
-
-        booking.setActive(false);
-        booking.setStatus("Cancelled");
-        bookingRepository.update(booking);
-
-        Laptop laptop = laptopRepository.findById(booking.getLaptopId());
-        if (laptop != null) {
-            laptop.setAvailable(true);
-            laptopRepository.update(laptop);
-        }
-
-        return true;
-    }
-
-    public double calculateTotalRevenue() throws IOException {
-        List<Booking> allBookings = bookingRepository.findAll();
-        double totalRevenue = 0.0;
-        
-        for (Booking booking : allBookings) {
-            if (!booking.isActive()) {
-                totalRevenue += booking.getTotalCharge();
-            }
-        }
-        
-        return totalRevenue;
-    }
-
-    public double calculateStudentDebt(int studentId) throws IOException {
-        List<Booking> studentBookings = bookingRepository.findByStudentId(studentId);
-        double totalDebt = 0.0;
-        
-        for (Booking booking : studentBookings) {
-            if (booking.isActive()) { 
-                totalDebt += booking.getTotalCharge();
-            }
-        }
-        
-        return totalDebt;
-    }
-
-    public boolean extendBooking(int bookingId, int additionalHours) throws IOException {
-        Booking booking = bookingRepository.findById(bookingId);
-        if (booking == null || !booking.isActive()) {
-            return false;
-        }
-
-        booking.setDurationHours(booking.getDurationHours() + additionalHours);
-        bookingRepository.update(booking);
-        
-        return true;
-    }
-
-    public List<Booking> getOverdueBookings() throws IOException {
-        List<Booking> activeBookings = bookingRepository.findActive();
-        List<Booking> overdueBookings = new java.util.ArrayList<>();
-        
-        java.util.Date now = new java.util.Date();
-        long currentTime = now.getTime();
-        
-        for (Booking booking : activeBookings) {
-            long bookingTime = booking.getBookingDate().getTime();
-            long durationInMillis = booking.getDurationHours() * 60 * 60 * 1000L;
-            
-            if (currentTime > bookingTime + durationInMillis) {
-                booking.setStatus("Overdue");
-                bookingRepository.update(booking);
-                overdueBookings.add(booking);
-            }
-        }
-        
-        return overdueBookings;
+    private String generateBookingId() {
+        return "BK" + System.currentTimeMillis();
     }
 }

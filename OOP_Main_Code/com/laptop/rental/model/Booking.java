@@ -1,100 +1,67 @@
 // Booking.java
 package com.laptop.rental.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Booking {
-    private int id;
+    private String bookingId;
     private int studentId;
     private int laptopId;
-    private Date bookingDate;
-    private Date returnDate;
-    private int durationHours;
-    private double chargePerHour;
-    private double totalCharge;
-    private boolean active;
-    private String status; // Active, Returned, Overdue
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private String status;
+    private LocalDateTime createdAt;
+    private LocalDateTime cancelledAt;
+    private LocalDateTime returnedAt;
 
-    public Booking(int studentId, int laptopId, int durationHours, double chargePerHour) {
-        this.studentId = studentId;
-        this.laptopId = laptopId;
-        this.bookingDate = new Date();
-        this.durationHours = durationHours;
-        this.chargePerHour = chargePerHour;
-        this.totalCharge = calculateTotalCharge();
-        this.active = true;
-        this.status = "Active";
+    public Booking() {
     }
 
-    public Booking(int id, int studentId, int laptopId, Date bookingDate, Date returnDate, 
-                   int durationHours, double chargePerHour, boolean active, String status) {
-        this.id = id;
+    public Booking(String bookingId, int studentId, int laptopId, LocalDateTime startDate, LocalDateTime endDate) {
+        this.bookingId = bookingId;
         this.studentId = studentId;
         this.laptopId = laptopId;
-        this.bookingDate = bookingDate;
-        this.returnDate = returnDate;
-        this.durationHours = durationHours;
-        this.chargePerHour = chargePerHour;
-        this.totalCharge = calculateTotalCharge();
-        this.active = active;
-        this.status = status;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = "ACTIVE";
+        this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    
+    public String getBookingId() { return bookingId; }
+    public void setBookingId(String bookingId) { this.bookingId = bookingId; }
+
     public int getStudentId() { return studentId; }
     public void setStudentId(int studentId) { this.studentId = studentId; }
     
     public int getLaptopId() { return laptopId; }
     public void setLaptopId(int laptopId) { this.laptopId = laptopId; }
     
-    public Date getBookingDate() { return bookingDate; }
-    public void setBookingDate(Date bookingDate) { this.bookingDate = bookingDate; }
+    public LocalDateTime getStartDate() { return startDate; }
+    public void setStartDate(LocalDateTime startDate) { this.startDate = startDate; }
     
-    public Date getReturnDate() { return returnDate; }
-    public void setReturnDate(Date returnDate) { this.returnDate = returnDate; }
-    
-    public int getDurationHours() { return durationHours; }
-    public void setDurationHours(int durationHours) { 
-        this.durationHours = durationHours; 
-        this.totalCharge = calculateTotalCharge();
-    }
-    
-    public double getChargePerHour() { return chargePerHour; }
-    public void setChargePerHour(double chargePerHour) { 
-        this.chargePerHour = chargePerHour; 
-        this.totalCharge = calculateTotalCharge();
-    }
-    
-    public double getTotalCharge() { return totalCharge; }
-    
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public LocalDateTime getEndDate() { return endDate; }
+    public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public double calculateTotalCharge() {
-        return durationHours * chargePerHour;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void markAsReturned() {
-        this.active = false;
-        this.returnDate = new Date();
-        this.status = "Returned";
-    }
+    public LocalDateTime getCancelledAt() { return cancelledAt; }
+    public void setCancelledAt(LocalDateTime cancelledAt) { this.cancelledAt = cancelledAt; }
+
+    public LocalDateTime getReturnedAt() { return returnedAt; }
+    public void setReturnedAt(LocalDateTime returnedAt) { this.returnedAt = returnedAt; }
 
     @Override
     public String toString() {
         return "Booking{" +
-                "id=" + id +
+                "bookingId='" + bookingId + '\'' +
                 ", studentId=" + studentId +
                 ", laptopId=" + laptopId +
-                ", bookingDate=" + bookingDate +
-                ", durationHours=" + durationHours +
-                ", totalCharge=" + totalCharge +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
                 ", status='" + status + '\'' +
                 '}';
     }

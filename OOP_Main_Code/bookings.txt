@@ -1,0 +1,1 @@
+ID: 0 StudentID: 1 LaptopID: 2001 BookingDate: 2025-06-20 11:39:02 ReturnDate: null Duration: 3 Rate: 250.00 Active: true Status: Active

@@ -2,28 +2,35 @@ package com.laptop.rental.repository;
 
 import com.laptop.rental.model.Booking;
 import java.io.*;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class BookingRepository {
     private static final String FILE_NAME = "bookings.txt";
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public void save(Booking booking) throws IOException {
+    public boolean save(Booking booking) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
-            String bookingDateStr = dateFormat.format(booking.getBookingDate());
-            String returnDateStr = booking.getReturnDate() != null ? dateFormat.format(booking.getReturnDate()) : "null";
+            String startDateStr = booking.getStartDate().format(formatter);
+            String endDateStr = booking.getEndDate().format(formatter);
+            String createdAtStr = booking.getCreatedAt() != null ? booking.getCreatedAt().format(formatter) : "null";
+            String cancelledAtStr = booking.getCancelledAt() != null ? booking.getCancelledAt().format(formatter) : "null";
+            String returnedAtStr = booking.getReturnedAt() != null ? booking.getReturnedAt().format(formatter) : "null";
             
-            writer.printf("ID: %d StudentID: %d LaptopID: %d BookingDate: %s ReturnDate: %s Duration: %d Rate: %.2f Active: %s Status: %s%n", 
-                    booking.getId(), booking.getStudentId(), booking.getLaptopId(), 
-                    bookingDateStr, returnDateStr, booking.getDurationHours(), 
-                    booking.getChargePerHour(), booking.isActive(), booking.getStatus());
+            writer.printf("BookingID: %s StudentID: %d LaptopID: %d StartDate: %s EndDate: %s Status: %s CreatedAt: %s CancelledAt: %s ReturnedAt: %s%n", 
+                    booking.getBookingId(), booking.getStudentId(), booking.getLaptopId(), 
+                    startDateStr, endDateStr, booking.getStatus(), createdAtStr, cancelledAtStr, returnedAtStr);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public List<Booking> findAll() throws IOException {
+    public List<Booking> findAll() {
         List<Booking> bookings = new ArrayList<>();
         File file = new File(FILE_NAME);
         if (!file.exists()) {
@@ -34,37 +41,47 @@ public class BookingRepository {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(" ");
-                if (parts.length >= 20) {
-                    int id = Integer.parseInt(parts[1]);
+                if (parts.length >= 18) {
+                    String bookingId = parts[1];
                     int studentId = Integer.parseInt(parts[3]);
                     int laptopId = Integer.parseInt(parts[5]);
-                    Date bookingDate = dateFormat.parse(parts[7] + " " + parts[8]);
-                    Date returnDate = parts[10].equals("null") ? null : dateFormat.parse(parts[10] + " " + parts[11]);
-                    int duration = Integer.parseInt(parts[13]);
-                    double rate = Double.parseDouble(parts[15]);
-                    boolean active = Boolean.parseBoolean(parts[17]);
-                    String status = parts[19];
+                    LocalDateTime startDate = LocalDateTime.parse(parts[7] + " " + parts[8], formatter);
+                    LocalDateTime endDate = LocalDateTime.parse(parts[10] + " " + parts[11], formatter);
+                    String status = parts[13];
+                    LocalDateTime createdAt = parts[15].equals("null") ? null : LocalDateTime.parse(parts[15] + " " + parts[16], formatter);
+                    LocalDateTime cancelledAt = parts[18].equals("null") ? null : LocalDateTime.parse(parts[18] + " " + parts[19], formatter);
+                    LocalDateTime returnedAt = parts[20].equals("null") ? null : LocalDateTime.parse(parts[20] + " " + parts[21], formatter);
                     
-                    Booking booking = new Booking(id, studentId, laptopId, bookingDate, returnDate, duration, rate, active, status);
+                    Booking booking = new Booking();
+                    booking.setBookingId(bookingId);
+                    booking.setStudentId(studentId);
+                    booking.setLaptopId(laptopId);
+                    booking.setStartDate(startDate);
+                    booking.setEndDate(endDate);
+                    booking.setStatus(status);
+                    booking.setCreatedAt(createdAt);
+                    booking.setCancelledAt(cancelledAt);
+                    booking.setReturnedAt(returnedAt);
+                    
                     bookings.add(booking);
                 }
             }
         } catch (Exception e) {
-            throw new IOException("Error parsing booking data: " + e.getMessage());
+            e.printStackTrace();
         }
         return bookings;
     }
 
-    public Booking findById(int id) throws IOException {
+    public Optional<Booking> findById(String bookingId) {
         for (Booking booking : findAll()) {
-            if (booking.getId() == id) {
-                return booking;
+            if (booking.getBookingId().equals(bookingId)) {
+                return Optional.of(booking);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public List<Booking> findByStudentId(int studentId) throws IOException {
+    public List<Booking> findByStudentId(int studentId) {
         List<Booking> studentBookings = new ArrayList<>();
         for (Booking booking : findAll()) {
             if (booking.getStudentId() == studentId) {
@@ -74,66 +91,50 @@ public class BookingRepository {
         return studentBookings;
     }
 
-    public List<Booking> findByLaptopId(int laptopId) throws IOException {
-        List<Booking> laptopBookings = new ArrayList<>();
+    public List<Booking> findByStatus(String status) {
+        List<Booking> statusBookings = new ArrayList<>();
         for (Booking booking : findAll()) {
-            if (booking.getLaptopId() == laptopId) {
-                laptopBookings.add(booking);
+            if (booking.getStatus().equals(status)) {
+                statusBookings.add(booking);
             }
         }
-        return laptopBookings;
+        return statusBookings;
     }
 
-    public List<Booking> findActive() throws IOException {
-        List<Booking> activeBookings = new ArrayList<>();
-        for (Booking booking : findAll()) {
-            if (booking.isActive()) {
-                activeBookings.add(booking);
-            }
-        }
-        return activeBookings;
-    }
-
-    public boolean markAsReturned(int studentId, int laptopId) throws IOException {
+    public boolean update(Booking booking) {
         List<Booking> bookings = findAll();
-        for (Booking booking : bookings) {
-            if (booking.getStudentId() == studentId && booking.getLaptopId() == laptopId && booking.isActive()) {
-                booking.markAsReturned();
-                saveAll(bookings);
-                return true;
+        for (int i = 0; i < bookings.size(); i++) {
+            if (bookings.get(i).getBookingId().equals(booking.getBookingId())) {
+                bookings.set(i, booking);
+                return saveAll(bookings);
             }
         }
         return false;
     }
 
-    public void update(Booking booking) throws IOException {
+    public boolean delete(String bookingId) {
         List<Booking> bookings = findAll();
-        for (int i = 0; i < bookings.size(); i++) {
-            if (bookings.get(i).getId() == booking.getId()) {
-                bookings.set(i, booking);
-                break;
-            }
-        }
-        saveAll(bookings);
+        bookings.removeIf(booking -> booking.getBookingId().equals(bookingId));
+        return saveAll(bookings);
     }
 
-    public void delete(int id) throws IOException {
-        List<Booking> bookings = findAll();
-        bookings.removeIf(booking -> booking.getId() == id);
-        saveAll(bookings);
-    }
-
-    private void saveAll(List<Booking> bookings) throws IOException {
+    private boolean saveAll(List<Booking> bookings) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, false))) {
             for (Booking booking : bookings) {
-                String bookingDateStr = dateFormat.format(booking.getBookingDate());
-                String returnDateStr = booking.getReturnDate() != null ? dateFormat.format(booking.getReturnDate()) : "null";
+                String startDateStr = booking.getStartDate().format(formatter);
+                String endDateStr = booking.getEndDate().format(formatter);
+                String createdAtStr = booking.getCreatedAt() != null ? booking.getCreatedAt().format(formatter) : "null";
+                String cancelledAtStr = booking.getCancelledAt() != null ? booking.getCancelledAt().format(formatter) : "null";
+                String returnedAtStr = booking.getReturnedAt() != null ? booking.getReturnedAt().format(formatter) : "null";
                 
-                writer.printf("ID: %d StudentID: %d LaptopID: %d BookingDate: %s ReturnDate: %s Duration: %d Rate: %.2f Active: %s Status: %s%n", 
-                        booking.getId(), booking.getStudentId(), booking.getLaptopId(), 
-                        bookingDateStr, returnDateStr, booking.getDurationHours(), 
-                        booking.getChargePerHour(), booking.isActive(), booking.getStatus());
+                writer.printf("BookingID: %s StudentID: %d LaptopID: %d StartDate: %s EndDate: %s Status: %s CreatedAt: %s CancelledAt: %s ReturnedAt: %s%n", 
+                        booking.getBookingId(), booking.getStudentId(), booking.getLaptopId(), 
+                        startDateStr, endDateStr, booking.getStatus(), createdAtStr, cancelledAtStr, returnedAtStr);
             }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 } 
