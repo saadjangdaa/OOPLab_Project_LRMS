@@ -1,0 +1,482 @@
+================================================================================
+                    LAPTOP RENTAL MANAGEMENT SYSTEM
+                           CODE DOCUMENTATION
+================================================================================
+
+PROJECT OVERVIEW:
+================
+This is a comprehensive Java-based Laptop Rental Management System designed for 
+educational institutions. The system manages laptop inventory, student registrations, 
+booking operations, and provides search functionality. It demonstrates Object-Oriented 
+Programming principles and follows a layered architecture pattern.
+
+TECHNICAL SPECIFICATIONS:
+=========================
+- Language: Java
+- Architecture: Layered Architecture (Model-View-Controller)
+- Design Patterns: Repository Pattern, Service Layer Pattern
+- Data Storage: File-based persistence (Text files)
+- User Interface: Console-based application
+
+PROJECT STRUCTURE:
+==================
+com.laptop.rental/
+├── model/                    # Data Models (Entities)
+│   ├── User.java            # Base user class
+│   ├── Student.java         # Student entity
+│   ├── Admin.java           # Admin entity
+│   ├── Laptop.java          # Laptop inventory entity
+│   └── Booking.java         # Booking/rental entity
+├── repository/              # Data Access Layer
+│   ├── UserRepository.java  # User data persistence
+│   ├── StudentRepository.java # Student data persistence
+│   ├── LaptopRepository.java # Laptop data persistence
+│   └── BookingRepository.java # Booking data persistence
+├── service/                 # Business Logic Layer
+│   ├── AuthService.java     # Authentication service
+│   ├── StudentService.java  # Student management service
+│   ├── LaptopService.java   # Laptop management service
+│   └── BookingService.java  # Booking management service
+└── Main.java               # Application entry point & UI
+
+================================================================================
+                           OOP PRINCIPLES IMPLEMENTATION
+================================================================================
+
+1. ENCAPSULATION:
+=================
+- All model classes use private fields with public getter/setter methods
+- Data is hidden from external access and can only be modified through controlled methods
+- Example: Laptop class has private fields (id, brand, model) with public accessors
+
+2. INHERITANCE:
+===============
+- Admin and Student classes extend the User class
+- Promotes code reuse and establishes "is-a" relationships
+- User class provides common functionality (username, password, role)
+- Admin and Student inherit basic user properties and add their own specific attributes
+
+3. POLYMORPHISM:
+================
+- Different user types (Admin/Student) can be treated as User objects
+- Service classes can work with different types of users through the base User class
+- Method overriding allows different behaviors for different user types
+
+4. ABSTRACTION:
+===============
+- Service layer abstracts complex business logic from the UI
+- Repository layer abstracts data access details from business logic
+- Users interact with high-level interfaces without knowing implementation details
+
+================================================================================
+                              MODULE DETAILED ANALYSIS
+================================================================================
+
+MODULE 1: REGISTRATION MODULE
+=============================
+
+Purpose:
+--------
+Handles user account creation, authentication, and role-based access control.
+
+Components:
+-----------
+1. User.java (Model)
+   - Base class for all users
+   - Contains: username, password, role (0=Admin, 1=Student)
+   - Methods: isAdmin(), isStudent(), getters/setters
+
+2. Student.java (Model)
+   - Extends User class
+   - Additional fields: id, name, email, phoneNumber, department
+   - Enhanced constructor for student-specific data
+
+3. Admin.java (Model)
+   - Extends User class
+   - Additional fields: adminId, email
+   - Admin-specific functionality
+
+4. AuthService.java (Service)
+   - Handles user authentication and registration
+   - Methods: login(), signup()
+   - Validates credentials and manages user sessions
+
+5. UserRepository.java (Repository)
+   - Manages user data persistence
+   - File: users.txt
+   - Methods: save(), findAll()
+
+6. StudentRepository.java (Repository)
+   - Manages student profile data
+   - File: students.txt
+   - Methods: save(), findAll(), findById(), update(), delete()
+
+Key Features:
+-------------
+- User registration with role assignment
+- Login authentication
+- Password validation
+- Role-based menu access
+- Student profile management (CRUD operations)
+
+Data Flow:
+----------
+1. User signs up → AuthService.signup() → UserRepository.save()
+2. User logs in → AuthService.login() → UserRepository.findAll() → validation
+3. Role check → appropriate menu (Admin/Student)
+
+OOP Implementation:
+-------------------
+- Inheritance: Student and Admin extend User
+- Encapsulation: Private fields with public accessors
+- Polymorphism: Different user types handled through base User class
+
+================================================================================
+
+MODULE 2: BOOKING MODULE
+========================
+
+Purpose:
+--------
+Manages laptop rental transactions, booking creation, returns, and booking history.
+
+Components:
+-----------
+1. Booking.java (Model)
+   - Represents rental transactions
+   - Fields: id, studentId, laptopId, bookingDate, returnDate, durationHours, 
+             chargePerHour, totalCharge, active, status
+   - Methods: calculateTotalCharge(), markAsReturned()
+
+2. BookingService.java (Service)
+   - Core booking business logic
+   - Methods: bookLaptop(), returnLaptop(), getStudentBookings(), 
+              getActiveBookings(), cancelBooking(), extendBooking(), 
+              calculateTotalRevenue(), getOverdueBookings()
+
+3. BookingRepository.java (Repository)
+   - Manages booking data persistence
+   - File: bookings.txt
+   - Methods: save(), findAll(), findById(), findByStudentId(), 
+              findByLaptopId(), findActive(), markAsReturned(), update()
+
+Key Features:
+-------------
+- Create new bookings with duration and pricing
+- Return laptops and update availability
+- View booking history (personal and system-wide)
+- Extend booking duration
+- Cancel active bookings
+- Calculate revenue and track overdue items
+- Automatic laptop availability management
+
+Data Flow:
+----------
+1. Book laptop: BookingService.bookLaptop() → BookingRepository.save() → 
+                LaptopService.setLaptopAvailability()
+2. Return laptop: BookingService.returnLaptop() → BookingRepository.markAsReturned() → 
+                  LaptopService.setLaptopAvailability()
+3. View bookings: BookingService.getStudentBookings() → BookingRepository.findByStudentId()
+
+OOP Implementation:
+-------------------
+- Encapsulation: Booking data protected with getters/setters
+- Association: Booking links Student and Laptop objects
+- Business Logic: Service layer encapsulates booking rules and calculations
+
+================================================================================
+
+MODULE 3: INVENTORY MODULE
+==========================
+
+Purpose:
+--------
+Manages laptop inventory, including adding, updating, deleting, and tracking 
+laptop availability and specifications.
+
+Components:
+-----------
+1. Laptop.java (Model)
+   - Represents laptop inventory items
+   - Fields: id, brand, model, specifications, available, hourlyRate, condition
+   - Methods: getters/setters, toString()
+
+2. LaptopService.java (Service)
+   - Laptop management business logic
+   - Methods: addLaptop(), getLaptopById(), getAllLaptops(), getAvailableLaptops(),
+              updateLaptop(), deleteLaptop(), setLaptopAvailability(), 
+              updateLaptopCondition(), updateLaptopRate(), getAvailableLaptopCount()
+
+3. LaptopRepository.java (Repository)
+   - Manages laptop data persistence
+   - File: laptops.txt
+   - Methods: save(), findAll(), findById(), findAvailable(), findByBrand(), 
+              update(), delete(), saveAll()
+
+Key Features:
+-------------
+- Add new laptops with specifications and pricing
+- Update laptop details (brand, model, specs, rate, condition)
+- Delete laptops from inventory
+- Set laptop availability (available/not available)
+- View all laptops or available laptops only
+- Search laptops by brand
+- Track laptop conditions (New, Good, Fair, Poor)
+- Manage hourly rental rates
+
+Data Flow:
+----------
+1. Add laptop: LaptopService.addLaptop() → LaptopRepository.save()
+2. Update laptop: LaptopService.updateLaptop() → LaptopRepository.update()
+3. Set availability: LaptopService.setLaptopAvailability() → LaptopRepository.update()
+4. View laptops: LaptopService.getAllLaptops() → LaptopRepository.findAll()
+
+OOP Implementation:
+-------------------
+- Encapsulation: Laptop properties protected with accessors
+- Data Validation: Service layer validates business rules
+- State Management: Tracks laptop availability and condition
+
+================================================================================
+
+MODULE 4: SEARCH FUNCTIONALITY MODULE
+=====================================
+
+Purpose:
+--------
+Provides comprehensive search capabilities for laptops based on various criteria,
+enabling users to find specific laptops quickly and efficiently.
+
+Components:
+-----------
+1. searchLaptops() (Main.java)
+   - Main search menu interface
+   - Provides search options: by brand, model, specifications, general search
+   - Handles user input and delegates to search implementation
+
+2. searchLaptopsByCriteria() (Main.java)
+   - Core search implementation
+   - Parameters: criteria (search type), searchQuery (search term), availableOnly (filter)
+   - Implements different search algorithms based on criteria
+
+Key Features:
+-------------
+- Search by Brand: Find laptops of specific brands
+- Search by Model: Find specific laptop models
+- Search by Specifications: Find laptops with specific specs (RAM, SSD, etc.)
+- General Search: Search across all fields simultaneously
+- Available Laptops Only: Filter search results to show only available laptops
+- Case-insensitive search
+- Partial matching (contains search)
+- Detailed result display with all laptop information
+
+Search Algorithms:
+------------------
+1. Brand Search: laptop.getBrand().toLowerCase().contains(searchQuery.toLowerCase())
+2. Model Search: laptop.getModel().toLowerCase().contains(searchQuery.toLowerCase())
+3. Specifications Search: laptop.getSpecifications().toLowerCase().contains(searchQuery.toLowerCase())
+4. General Search: Combines brand, model, and specifications search
+5. Available Filter: Additional filter for laptop.isAvailable() == true
+
+Data Flow:
+----------
+1. User selects search type → searchLaptops() menu
+2. User enters search query → searchLaptopsByCriteria() called
+3. LaptopService.getAllLaptops() → retrieves all laptops
+4. Filtering algorithm applied → search results generated
+5. Results displayed in formatted table
+
+OOP Implementation:
+-------------------
+- Method Overloading: Different search criteria handled through parameters
+- Encapsulation: Search logic encapsulated in private methods
+- Polymorphism: Same search method handles different search types
+
+================================================================================
+                           DESIGN PATTERNS USED
+================================================================================
+
+1. REPOSITORY PATTERN:
+======================
+- Separates data access logic from business logic
+- Provides a consistent interface for data operations
+- Makes the system database-agnostic (currently file-based)
+- Example: UserRepository, LaptopRepository, BookingRepository
+
+2. SERVICE LAYER PATTERN:
+=========================
+- Encapsulates business logic and rules
+- Provides clean API for the presentation layer
+- Handles data validation and business operations
+- Example: AuthService, BookingService, LaptopService
+
+3. MODEL-VIEW-CONTROLLER (MVC):
+================================
+- Model: Data classes (User, Student, Laptop, Booking)
+- View: Console interface in Main.java
+- Controller: Service classes handle business logic
+
+4. LAYERED ARCHITECTURE:
+========================
+- Presentation Layer: Main.java (UI)
+- Business Layer: Service classes
+- Data Access Layer: Repository classes
+- Data Layer: Text files
+
+================================================================================
+                           DATA PERSISTENCE
+================================================================================
+
+File Structure:
+===============
+1. users.txt: User accounts and authentication
+   Format: "Username: {username} Password: {password} Role: {role}"
+
+2. students.txt: Student profiles
+   Format: "ID: {id} Name: {name} Password: {password} Email: {email} Phone: {phone} Department: {department}"
+
+3. laptops.txt: Laptop inventory
+   Format: "ID: {id} Brand: {brand} Model: {model} Specs: {specs} Available: {available} Rate: {rate} Condition: {condition}"
+
+4. bookings.txt: Booking records
+   Format: "ID: {id} StudentID: {studentId} LaptopID: {laptopId} BookingDate: {date} ReturnDate: {date} Duration: {duration} Rate: {rate} Active: {active} Status: {status}"
+
+Data Operations:
+================
+- Create: Append new records to files
+- Read: Parse file contents into objects
+- Update: Read all records, modify specific record, rewrite entire file
+- Delete: Read all records, remove specific record, rewrite entire file
+
+================================================================================
+                           ERROR HANDLING
+================================================================================
+
+1. File I/O Errors:
+===================
+- IOException handling in all repository classes
+- Graceful handling of missing files
+- Automatic file creation on first use
+
+2. Input Validation:
+====================
+- Scanner input validation
+- Number format exception handling
+- Null pointer checks
+- Business rule validation
+
+3. Business Logic Errors:
+=========================
+- Duplicate ID checking
+- Availability validation
+- Booking rule enforcement
+- User-friendly error messages
+
+================================================================================
+                           USER INTERFACE DESIGN
+================================================================================
+
+Menu Structure:
+===============
+1. Main Menu: Login, Signup, Exit
+2. Admin Menu: Student Management, Laptop Management, Bookings, Statistics
+3. Student Menu: View Laptops, Search, Book, Return, View Bookings, Extend
+4. Sub-menus: Detailed options for each major function
+
+User Experience:
+================
+- Clear menu options with numbered choices
+- Consistent formatting and spacing
+- Informative success/error messages
+- Confirmation prompts for destructive operations
+- Tabular data display for better readability
+
+Input Handling:
+===============
+- Scanner.nextLine() for string input
+- Scanner.nextInt() for numeric input
+- Input validation and error recovery
+- Graceful handling of invalid inputs
+
+================================================================================
+                           SYSTEM FEATURES SUMMARY
+================================================================================
+
+Admin Features:
+===============
+✓ User Management (CRUD operations)
+✓ Laptop Inventory Management (CRUD operations)
+✓ Booking Overview and Statistics
+✓ Overdue Booking Tracking
+✓ System Revenue Calculation
+✓ Laptop Availability Management
+
+Student Features:
+=================
+✓ Browse Available Laptops
+✓ Advanced Search Functionality
+✓ Book Laptops with Duration
+✓ Return Borrowed Laptops
+✓ View Personal Booking History
+✓ Extend Booking Duration
+
+System Features:
+================
+✓ File-based Data Persistence
+✓ Role-based Access Control
+✓ Comprehensive Error Handling
+✓ Input Validation
+✓ Automatic Data File Creation
+✓ Search and Filter Capabilities
+
+================================================================================
+                           FUTURE ENHANCEMENTS
+================================================================================
+
+1. Database Integration:
+========================
+- Replace file storage with SQL database
+- Implement connection pooling
+- Add data backup and recovery
+
+2. GUI Interface:
+=================
+- Develop graphical user interface
+- Implement modern UI/UX design
+- Add data visualization features
+
+3. Advanced Features:
+=====================
+- Email notifications for overdue items
+- Payment processing integration
+- Advanced reporting and analytics
+- Mobile application development
+
+4. Security Enhancements:
+==========================
+- Password encryption
+- Session management
+- Access control improvements
+- Audit logging
+
+================================================================================
+                           CONCLUSION
+================================================================================
+
+This Laptop Rental Management System demonstrates comprehensive implementation of:
+- Object-Oriented Programming principles
+- Design patterns and best practices
+- Layered architecture
+- File-based data persistence
+- Console-based user interface
+- Complete CRUD operations
+- Advanced search functionality
+- Role-based access control
+
+The system is fully functional, well-documented, and provides a solid foundation for 
+further development and enhancement. It serves as an excellent example of Java 
+application development with proper OOP implementation.
+
+================================================================================
+                           END OF DOCUMENTATION
+================================================================================
