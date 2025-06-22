@@ -1,0 +1,1 @@
+Laptop ID: 001	Brand: DELL	Model: Lat	Processor: i5-10th	Specs: 8gb-256gb
